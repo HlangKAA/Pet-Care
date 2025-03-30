@@ -1,0 +1,728 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap');
+
+:root {
+    --bg-text-shadow: 0 2px 4px rgb(13 0 77 / 8%), 0 3px 6px rgb(13 0 77 / 8%), 0 8px 16px rgb(13 0 77 / 8%);
+    --bg-box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.621);
+}
+*::-webkit-scrollbar{
+    width: .4rem;
+}
+*::-webkit-scrollbar-track{
+    background: rgb(6, 6, 44);
+}
+*::-webkit-scrollbar-thumb{
+    background: rgb(139, 69, 19);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Noto Sans Thai", sans-serif !important;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* text-shadow: var(--bg-text-shadow); */
+}
+
+nav {
+    position: fixed;
+    width: 100%;
+    background-color: rgb(139, 69, 19);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+nav .logo {
+    height: auto;
+}
+
+nav .logo p {
+    color: rgb(0, 0, 0);
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+nav ul {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li {
+    list-style: none;
+    white-space: nowrap;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #f0f0f0;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 5px;
+}
+
+nav ul li button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: white;
+}
+
+nav ul li button.btn-info {
+    background-color: #17a2b8;
+}
+
+nav ul li button.btn-info:hover {
+    background-color: #138496;
+}
+
+nav ul li button.btn-danger {
+    background-color: #dc3545;
+}
+
+nav ul li button.btn-danger:hover {
+    background-color: #c82333;
+}
+
+#firstsection{
+    height: 100vh;
+    background-color: rgb(243, 0, 0);
+    width: 100%;
+    /* z-index: 2000; */
+}
+
+#firstsection .carousel-inner{
+    width: 100%;
+    height: 100vh;
+    /* padding: 0 50px; */
+}
+#firstsection .carousel-inner::after{
+    content: "";
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+}
+
+#firstsection .carousel-item{
+    overflow: hidden;
+}
+
+#firstsection .carousel-item img{
+    width: 100%;
+    height: 100vh;
+}
+
+
+#firstsection .welcomeline{
+    position: absolute; 
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+#firstsection .welcometag{
+    font-size: 110px;
+    font-weight: 700;
+    font-family: "Noto Sans Thai", sans-serif;
+    letter-spacing: 2px;
+    line-height: 100px;
+    padding: 5px;
+    background: -webkit-linear-gradient(317deg, rgb(139, 69, 19) 0%, rgba(248, 190, 109, 0.863) 70%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* secondsection */
+
+#secondsection{
+    height: 100vh;
+}
+
+#secondsection img{
+    /* background-size: cover; */
+    height: 100vh;
+    width: 100%;
+    filter: blur(20px);
+    position: absolute;
+    /* -webkit-backdrop-filter: blur(30px);  */
+    z-index: -2;
+}
+
+.ourroom{
+    position: relative;
+    top: 90px;
+    height: 400px;
+    width: 100%;
+    /* background-color: #0040ff; */
+}
+
+.head{
+    text-align: center;
+    margin-bottom: 40px;
+    font-family: "Noto Sans Thai", sans-serif;
+    font-weight: 600;
+}
+
+.roomselect{
+    display: flex;
+    height: 100%;
+    justify-content: space-evenly;
+}
+
+.roomselect .roombox{
+    height: 115%;
+    width: 300px;
+    background-color:rgb(171, 93, 37);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.hotelphoto{
+    height: 250px;
+    width: 100%;
+    background-color: aquamarine;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.hotelphoto:hover {
+    transform: scale(1.05);
+}
+
+.h1{
+    background-image: url(../image/cathotel1.jpg);
+}
+.h2{
+    background-image: url(../image/cathotel2.jpg);
+}
+.h3{
+    background-image: url(../image/doghotel1.jpg);
+}
+.h4{
+    background-image: url(../image/doghotel2.jpg);
+}
+
+.roomdata{
+    text-align: center;
+}
+
+.roomdata h2{
+    color: rgb(207, 211, 255);
+    font-size: 30px;
+    font-weight: 600;
+    font-family: "Noto Sans Thai", sans-serif;
+}
+
+.sevices{
+    display: flex;
+}
+
+.services i{
+    color: white;
+    margin: 7px;
+}
+
+.bookbtn{
+   margin: 10px;
+   font-family: "Noto Sans Thai", sans-serif;
+   font-weight: 500;
+}
+
+/* roombookcss */
+
+#guestdetailpanel{
+    height: 100vh;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.558);
+    position: fixed;
+    z-index: 10000;
+    font-family: "Noto Sans Thai", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#guestdetailpanel .guestdetailpanelform{
+    height: 500px;
+    width: 800px;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+#guestdetailpanel .head{
+    height: 60px;
+    width: 100%;
+    background-color: #0040ff;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    color: white;
+}
+
+#guestdetailpanel .head h3{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#guestdetailpanel .head i{
+    font-size: 25px;
+    cursor: pointer;
+}
+
+#guestdetailpanel .middle{
+    height: 380px;
+    width: 100%;
+    display: flex;
+    padding: 20px;
+}
+
+#guestdetailpanel .guestinfo{
+    height: 100%;
+    width: 50%;
+    padding: 0 20px;
+}
+
+#guestdetailpanel .guestinfo h4{
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+#guestdetailpanel .guestinfo input{
+    width: 100%;
+    height: 40px;
+    margin: 10px 0;
+    border: 1px solid #0040ff;
+    border-radius: 5px;
+    padding: 0 10px;
+}
+
+#guestdetailpanel .line{
+    height: 100%;
+    width: 1px;
+    background-color: #0040ff;
+    margin: 0 20px;
+}
+
+#guestdetailpanel .reservationinfo{
+    height: 100%;
+    width: 50%;
+    padding: 0 20px;
+}
+
+#guestdetailpanel .reservationinfo h4{
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+#guestdetailpanel .selectinput{
+    width: 100%;
+    height: 40px;
+    margin: 10px 0;
+    border: 1px solid #0040ff;
+    border-radius: 5px;
+    padding: 0 10px;
+}
+
+#guestdetailpanel .datesection{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#guestdetailpanel .datesection span{
+    display: flex;
+    flex-direction: column;
+}
+
+#guestdetailpanel .datesection input{
+    width: 200px;
+    height: 40px;
+    margin: 10px 0;
+    border: 1px solid #0040ff;
+    border-radius: 5px;
+    padding: 0 10px;
+}
+
+#guestdetailpanel .footer{
+    height: 60px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#guestdetailpanel .footer button{
+    padding: 10px 30px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0040ff;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#guestdetailpanel .footer button:hover{
+    background-color: #0033cc;
+}
+
+#thirdsection{
+    height: 80vh;
+    width: 100%;
+    /* background-color: black; */
+}
+
+.facility{
+    height: 70%;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.facility .box{
+    height: 100%;
+    width: 310px;
+    border: 2px solid white;
+    background-color: #0040ff;
+}
+
+.facility .box h2{
+    text-align: center;
+    position: relative;
+    top: 80%;
+    color: white;
+    background-color: #0000005e;
+    font-weight: 500;
+    font-family: "Noto Sans Thai", sans-serif;
+}
+
+.box:nth-child(1){
+    background-image: url(../image/เครื่องฟอกอากาศ.jpg);
+    background-size: cover;
+}
+.box:nth-child(2){
+    background-image: url(../image/อาหาร.jpg);
+    background-size: cover;
+}
+.box:nth-child(3){
+    background-image: url(../image/พนักงานดูแลสัตว์.jpg);
+    background-size: cover;
+}
+.box:nth-child(4){
+    background-image: url(../image/สนามหญ้า.jpg);
+    background-size: cover;
+}
+
+#contactus{
+    height: 70px;
+    width: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:0 100px;
+}
+
+#contactus .social{
+    width: 200px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#contactus i{
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+#contactus .createdby{
+    color: white;
+    font-weight: 400;
+}
+
+/* responsive stuff */
+
+@media(max-width: 30rem){
+    nav{
+        justify-content: center;
+        position: relative;
+        background-color: #96a8f88c;
+    }
+    nav ul{
+        display: none;
+    }
+    #firstsection{
+        height: 50vh;
+        text-align: center;
+    }
+    #firstsection .carousel-inner{
+        height: 50vh;
+    }
+    #firstsection .carousel-inner::after{
+        height: 50vh;
+    }
+    #firstsection .carousel-item img{
+        height: 50vh;
+    }
+    #firstsection .welcomeline{
+        height: 50vh;
+        
+    }
+    #firstsection .welcometag{
+        text-align: center;
+        font-size: 50px;
+        line-height: 60px;
+    }
+    #secondsection{
+        height: auto;
+    }
+    #secondsection{
+        height: 240vh;
+    }
+    #secondsection img{
+        display: none;
+    }
+    .ourroom{
+        top: 30px;
+        height: auto;
+    }
+    .roomselect{
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    .roomselect .roombox{
+        width: 75%;
+    }
+
+
+    #thirdsection{
+        height: 100vh;
+    }
+    .facility{
+        height: 70%;
+        flex-wrap: wrap;
+    }
+    .facility .box{
+        margin: 0;
+        padding: 0;
+        height: 55%;
+        width: 50%; 
+    }
+
+    .facility .box h2{
+        font-size: 18px;
+        flex-wrap: wrap;
+        font-family: "Noto Sans Thai", sans-serif;
+    }
+    
+    .box:nth-child(5){
+        display: none;
+    }
+
+    #contactus{
+        padding: 0 30px;
+    }
+}
+
+/* Payment Panel Styles */
+#paymentDetailsPanel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#paymentDetailsPanel .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#paymentDetailsPanel .head i {
+    font-size: 24px;
+    cursor: pointer;
+    color: #dc3545;
+}
+
+#paymentDetailsPanel .head i:hover {
+    color: #c82333;
+}
+
+#paymentDetailsPanel .middle {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.booking-summary {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f8f9fa;
+}
+
+.payment-info {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f8f9fa;
+}
+
+.payment-upload {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f8f9fa;
+}
+
+.qr-code {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.price-details {
+    margin-top: 20px;
+}
+
+.total-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 10px;
+}
+
+.payment-upload input[type="file"] {
+    margin: 10px 0;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.action-buttons button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+}
+
+/* History Panel Styles */
+#historyPanel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.history-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+}
+
+.history-item h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.history-item p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.status-pending {
+    color: #ffc107;
+}
+
+.status-approved {
+    color: #28a745;
+}
+
+.status-rejected {
+    color: #dc3545;
+}
+
+.history-item .booking-date {
+    font-size: 0.9em;
+    color: #999;
+}
+
+/* Close Button Styles */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.btn-close:hover {
+    color: #dc3545;
+}
