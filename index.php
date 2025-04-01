@@ -55,7 +55,6 @@ function prepareAndExecute($conn, $sql, $params)
     <!-- Main Section -->
     <section id="auth_section">
         <div class="logo">
-            <!-- <img class="bluebirdlogo" src="./image/bluebirdlogo.png" alt="logo"> -->
             <p>Pet-Care</p>
         </div>
         <div class="auth_container">
@@ -72,14 +71,19 @@ function prepareAndExecute($conn, $sql, $params)
                 if (isset($_POST['user_login_submit'])) {
                     $email = $_POST['Email'];
                     $password = $_POST['Password'];
-                    $sql = "SELECT * FROM signup WHERE Email = ? AND Password = BINARY ?";
-                    $stmt = prepareAndExecute($conn, $sql, [$email, $password]);
+                    $sql = "SELECT * FROM signup WHERE Email = ?";
+                    $stmt = prepareAndExecute($conn, $sql, [$email]);
                     $result = $stmt->get_result();
 
                     if ($result->num_rows > 0) {
-                        $_SESSION['usermail'] = $email;
-                        header("Location: home.php");
-                        exit();
+                        $user = $result->fetch_assoc();
+                        if (password_verify($password, $user['Password'])) {
+                            $_SESSION['usermail'] = $email;
+                            header("Location: home.php");
+                            exit();
+                        } else {
+                            echo "<script>swal({ title: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', icon: 'error', });</script>";
+                        }
                     } else {
                         echo "<script>swal({ title: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', icon: 'error', });</script>";
                     }
@@ -105,14 +109,19 @@ function prepareAndExecute($conn, $sql, $params)
                 if (isset($_POST['Emp_login_submit'])) {
                     $email = $_POST['Emp_Email'];
                     $password = $_POST['Emp_Password'];
-                    $sql = "SELECT * FROM emp_login WHERE Emp_Email = ? AND Emp_Password = BINARY ?";
-                    $stmt = prepareAndExecute($conn, $sql, [$email, $password]);
+                    $sql = "SELECT * FROM emp_login WHERE Emp_Email = ?";
+                    $stmt = prepareAndExecute($conn, $sql, [$email]);
                     $result = $stmt->get_result();
 
                     if ($result->num_rows > 0) {
-                        $_SESSION['usermail'] = $email;
-                        header("Location: admin/admin.php");
-                        exit();
+                        $emp = $result->fetch_assoc();
+                        if (password_verify($password, $emp['Emp_Password'])) {
+                            $_SESSION['usermail'] = $email;
+                            header("Location: admin/admin.php");
+                            exit();
+                        } else {
+                            echo "<script>swal({ title: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', icon: 'error', });</script>";
+                        }
                     } else {
                         echo "<script>swal({ title: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', icon: 'error', });</script>";
                     }
@@ -150,8 +159,9 @@ function prepareAndExecute($conn, $sql, $params)
                         if ($result->num_rows > 0) {
                             echo "<script>swal({ title: 'อีเมลนี้มีอยู่ในระบบแล้ว', icon: 'error', });</script>";
                         } else {
+                            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                             $sql_insert = "INSERT INTO signup (Username, Email, Password) VALUES (?, ?, ?)";
-                            $stmt_insert = prepareAndExecute($conn, $sql_insert, [$username, $email, $password]);
+                            $stmt_insert = prepareAndExecute($conn, $sql_insert, [$username, $email, $hashed_password]);
 
                             if ($stmt_insert->affected_rows > 0) {
                                 $_SESSION['usermail'] = $email;

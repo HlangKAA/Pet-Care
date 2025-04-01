@@ -2,10 +2,17 @@
     session_start();
     include '../config.php';
 
-    // roombook
-    $roombooksql ="Select * from roombook";
+    // roombook (ไม่รวม Checkout)
+    $roombooksql ="SELECT * FROM roombook";
     $roombookre = mysqli_query($conn, $roombooksql);
-    $roombookrow = mysqli_num_rows($roombookre);
+    
+    // นับเฉพาะที่ไม่ใช่ Checkout
+    $roombookrow = 0;
+    while ($row = mysqli_fetch_assoc($roombookre)) {
+        if ($row['stat'] != 'Checkout') {
+            $roombookrow++;
+        }
+    }
 
     // staff
     $staffsql ="Select * from staff";
@@ -17,22 +24,42 @@
     $roomre = mysqli_query($conn, $roomsql);
     $roomrow = mysqli_num_rows($roomre);
 
-    //roombook roomtype
+    //roombook roomtype (ไม่รวม Checkout)
     $chartroom1 = "SELECT * FROM roombook WHERE RoomType='ห้องเล็ก - แมว'";
     $chartroom1re = mysqli_query($conn, $chartroom1);
-    $chartroom1row = mysqli_num_rows($chartroom1re);
+    $chartroom1row = 0;
+    while ($row = mysqli_fetch_assoc($chartroom1re)) {
+        if ($row['stat'] != 'Checkout') {
+            $chartroom1row++;
+        }
+    }
 
     $chartroom2 = "SELECT * FROM roombook WHERE RoomType='ห้องใหญ่ - แมว'";
     $chartroom2re = mysqli_query($conn, $chartroom2);
-    $chartroom2row = mysqli_num_rows($chartroom2re);
+    $chartroom2row = 0;
+    while ($row = mysqli_fetch_assoc($chartroom2re)) {
+        if ($row['stat'] != 'Checkout') {
+            $chartroom2row++;
+        }
+    }
 
     $chartroom3 = "SELECT * FROM roombook WHERE RoomType='ห้องเล็ก - หมา'";
     $chartroom3re = mysqli_query($conn, $chartroom3);
-    $chartroom3row = mysqli_num_rows($chartroom3re);
+    $chartroom3row = 0;
+    while ($row = mysqli_fetch_assoc($chartroom3re)) {
+        if ($row['stat'] != 'Checkout') {
+            $chartroom3row++;
+        }
+    }
 
     $chartroom4 = "SELECT * FROM roombook WHERE RoomType='ห้องใหญ่ - หมา'";
     $chartroom4re = mysqli_query($conn, $chartroom4);
-    $chartroom4row = mysqli_num_rows($chartroom4re);
+    $chartroom4row = 0;
+    while ($row = mysqli_fetch_assoc($chartroom4re)) {
+        if ($row['stat'] != 'Checkout') {
+            $chartroom4row++;
+        }
+    }
 ?>
 <!-- moriss profit -->
 <?php 	

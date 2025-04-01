@@ -2,6 +2,11 @@
 session_start();
 include '../config.php';
 
+// SQL for roombook
+$roombooksql = "SELECT * FROM roombook";
+$roombookre = mysqli_query($conn, $roombooksql);
+$roombooksqldata = mysqli_fetch_all($roombookre, MYSQLI_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -20,9 +25,79 @@ include '../config.php';
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <link rel="stylesheet" href="./css/roombook.css">
     <title>PET-CARE - Admin</title>
+    <style>
+        .searchsection {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .searchsection input {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 300px;
+        }
+        .adduser, .exportexcel {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        .adduser {
+            background-color: #007bff;
+            margin-left: 10px;
+        }
+        .exportexcel {
+            background-color: #28a745;
+        }
+        .table thead th {
+            background-color: #4169E1;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+        .table tbody td {
+            padding: 8px;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            margin: 2px;
+        }
+        .action {
+            min-width: 200px;
+        }
+        .datesection {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .datesection div {
+            width: 100%;
+        }
+        .datesection label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .datesection input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body>
+    <div class="page-title">การจองห้องพัก</div>
+    
     <!-- guestdetailpanel -->
 
     <div id="guestdetailpanel">
@@ -63,14 +138,14 @@ include '../config.php';
                         <option value="1">1</option>
                     </select>
                     <div class="datesection">
-                        <span>
+                        <div class="mb-3">
                             <label for="cin">วันที่เข้าพัก</label>
-                            <input name="cin" type="date">
-                        </span>
-                        <span>
+                            <input name="cin" type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
                             <label for="cout">วันที่ออก</label>
-                            <input name="cout" type="date">
-                        </span>
+                            <input name="cout" type="date" class="form-control">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,8 +187,8 @@ include '../config.php';
             }
         }
 
-        $csql ="select * from payment";
-        $cre= mysqli_query($conn,$csql);
+        $csql ="select * from roombook";
+        $cre = mysqli_query($conn,$csql);
         $cr =0 ;
         $csc =0;
         $cgh = 0;
@@ -121,25 +196,28 @@ include '../config.php';
         $cdr = 0;
         while($crow=mysqli_fetch_array($cre))
         {
-            $cr = $cr + 1;
-            $cs = $crow['RoomType'];
-                        
-            if($cs=="ห้องเล็ก - แมว")
-            {
-                $csc = $csc + 1;
-            }
-                        
-            if($cs=="ห้องเล็ก - หมา" )
-            {
-                $cgh = $cgh + 1;
-            }
-            if($cs=="ห้องใหญ่ - หมา")
-            {
-                $csr = $csr + 1;
-            }
-            if($cs=="ห้องใหญ่ - แมว")
-            {
-                $cdr = $cdr + 1;
+            // เช็คสถานะว่าไม่ใช่ Checkout
+            if($crow['stat'] != 'Checkout') {
+                $cr = $cr + 1;
+                $cs = $crow['RoomType'];
+                            
+                if($cs=="ห้องเล็ก - แมว")
+                {
+                    $csc = $csc + 1;
+                }
+                            
+                if($cs=="ห้องเล็ก - หมา" )
+                {
+                    $cgh = $cgh + 1;
+                }
+                if($cs=="ห้องใหญ่ - หมา")
+                {
+                    $csr = $csr + 1;
+                }
+                if($cs=="ห้องใหญ่ - แมว")
+                {
+                    $cdr = $cdr + 1;
+                }
             }
         }
         // room availablity
@@ -259,9 +337,16 @@ include '../config.php';
 
     <div class="roombooktable" class="table-responsive-xl">
         <?php
-            $roombooktablesql = "SELECT * FROM roombook";
+            // แก้ไข query เพื่อแก้ปัญหา mysqli_result เป็น boolean
+            $roombooktablesql = "SELECT rb.* FROM roombook rb ORDER BY rb.id ASC";
             $roombookresult = mysqli_query($conn, $roombooktablesql);
-            $nums = mysqli_num_rows($roombookresult);
+            
+            // ตรวจสอบความผิดพลาดของ query
+            if ($roombookresult === false) {
+                echo "Error in query: " . mysqli_error($conn);
+            } else {
+                $nums = mysqli_num_rows($roombookresult);
+            }
         ?>
         <table class="table table-bordered" id="table-data">
             <thead>
@@ -271,6 +356,7 @@ include '../config.php';
                     <th scope="col">Email</th>
                     <th scope="col">Phone</th>
                     <th scope="col">Type of Room</th>
+                    <th scope="col">Room No.</th>
                     <th scope="col">Count</th>
                     <th scope="col">No of Room</th>
                     <th scope="col">Check-In</th>
@@ -292,6 +378,21 @@ include '../config.php';
                     <td><?php echo $res['Email'] ?></td>
                     <td><?php echo $res['Phone'] ?></td>
                     <td><?php echo $res['RoomType'] ?></td>
+                    <td>
+                        <?php
+                        // ดึงเลขห้องจากตาราง room_assigned
+                        $room_sql = "SELECT r.room_number 
+                                   FROM room_assigned ra 
+                                   INNER JOIN room r ON ra.room_id = r.id 
+                                   WHERE ra.booking_id = " . $res['id'];
+                        $room_result = mysqli_query($conn, $room_sql);
+                        $room_numbers = array();
+                        while($room = mysqli_fetch_assoc($room_result)) {
+                            $room_numbers[] = $room['room_number'];
+                        }
+                        echo !empty($room_numbers) ? implode(', ', $room_numbers) : 'N/A';
+                        ?>
+                    </td>
                     <td><?php echo $res['Count'] ?></td>
                     <td><?php echo $res['NoofRoom'] ?></td>
                     <td><?php echo $res['cin'] ?></td>
@@ -309,13 +410,21 @@ include '../config.php';
                     </td>
                     <td class="action">
                         <?php
+                            // เพิ่มการแสดงผลสถานะเพื่อตรวจสอบ
+                            echo "<!-- Debug: Status = " . $res['stat'] . " -->";
+                            
                             if($res['stat'] == "Confirm")
                             {
-                                echo " ";
+                                echo "<a href='roomcheckout.php?id=". $res['id'] ."'><button class='btn btn-warning'>Checkout</button></a>";
+                            }
+                            else if($res['stat'] == "Pending")
+                            {
+                                echo "<a href='roomconfirm.php?id=". $res['id'] ."'><button class='btn btn-success'>Confirm</button></a>";
                             }
                             else
                             {
-                                echo "<a href='roomconfirm.php?id=". $res['id'] ."'><button class='btn btn-success'>Confirm</button></a>";
+                                // แสดงสถานะที่ไม่รู้จัก
+                                echo "<span class='text-danger'>สถานะไม่ถูกต้อง: " . $res['stat'] . "</span>";
                             }
                         ?>
                         <a href="roombookedit.php?id=<?php echo $res['id'] ?>"><button class="btn btn-primary">Edit</button></a>

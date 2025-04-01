@@ -34,13 +34,13 @@ if (isset($_POST['guestdetailedit'])) {
 
     $type_of_room = 0;
     if($EditRoomType == "ห้องเล็ก - แมว") {
-        $type_of_room = 3000;
+        $type_of_room = 200;
     } else if($EditRoomType == "ห้องใหญ่ - แมว") {
-        $type_of_room = 2000;
+        $type_of_room = 300;
     } else if($EditRoomType == "ห้องเล็ก - หมา") {
-        $type_of_room = 1500;
+        $type_of_room = 300;
     } else if($EditRoomType == "ห้องใหญ่ - หมา") {
-        $type_of_room = 1000;
+        $type_of_room = 500;
     }
     
     // คำนวณจำนวนวัน
@@ -50,7 +50,31 @@ if (isset($_POST['guestdetailedit'])) {
     $editttot = intval($type_of_room) * intval($Editnoofday) * intval($EditNoofRoom);
     $editfintot = $editttot;
 
-    $psql = "UPDATE payment SET Name = '$EditName', Email = '$EditEmail', RoomType = '$EditRoomType', Count = '$EditCount', NoofRoom = '$EditNoofRoom', cin = '$Editcin', cout = '$Editcout', noofdays = '$Editnoofday', roomtotal = '$editttot', finaltotal = '$editfintot' WHERE id = '$id'";
+    // ดึงเลขห้องที่จองจากตาราง room_assigned
+    $room_sql = "SELECT r.room_number 
+                 FROM room_assigned ra 
+                 INNER JOIN room r ON ra.room_id = r.id 
+                 WHERE ra.booking_id = '$id'";
+    $room_result = mysqli_query($conn, $room_sql);
+    $room_numbers = array();
+    while($room = mysqli_fetch_assoc($room_result)) {
+        $room_numbers[] = $room['room_number'];
+    }
+    $room_numbers_str = implode(', ', $room_numbers);
+
+    $psql = "UPDATE payment SET 
+             Name = '$EditName', 
+             Email = '$EditEmail', 
+             RoomType = '$EditRoomType', 
+             Count = '$EditCount', 
+             NoofRoom = '$EditNoofRoom', 
+             cin = '$Editcin', 
+             cout = '$Editcout', 
+             noofdays = '$Editnoofday', 
+             roomtotal = '$editttot', 
+             finaltotal = '$editfintot',
+             room_number = '$room_numbers_str' 
+             WHERE id = '$id'";
 
     $paymentresult = mysqli_query($conn, $psql);
 

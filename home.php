@@ -121,10 +121,10 @@ if($usermail == true){
 
         <!-- Payment Details Panel -->
         <div id="paymentDetailsPanel" style="display: none;">
-            <div class="head">
+            <!-- <div class="head">
                 <h3>รายละเอียดการชำระเงิน</h3>
                 <i class="fa-solid fa-circle-xmark" onclick="closePaymentPanel()"></i>
-            </div>
+            </div> -->
             <div class="middle">
                 <div class="booking-summary">
                     <h4>สรุปการจอง</h4>
@@ -178,118 +178,201 @@ if($usermail == true){
                 $cout = $_POST['cout'];
                 $total_price = $_POST['total_price'];
 
-                if($Name == "" || $Email == ""){
-                    echo "<script>swal({
-                        title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                        icon: 'error',
-                    });
+                // Validate all required fields
+                if(empty($Name) || empty($Email) || empty($Phone) || empty($RoomType) || 
+                   empty($Count) || empty($NoofRoom) || empty($cin) || empty($cout)) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                            text: 'กรุณาตรวจสอบและกรอกข้อมูลที่จำเป็นให้ครบถ้วน',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Validate dates
+                $checkInDate = strtotime($cin);
+                $checkOutDate = strtotime($cout);
+                $today = strtotime(date('Y-m-d'));
+
+                if($checkInDate < $today) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'วันที่ไม่ถูกต้อง',
+                            text: 'วันที่เข้าพักต้องไม่น้อยกว่าวันปัจจุบัน',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                if($checkOutDate <= $checkInDate) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'วันที่ไม่ถูกต้อง',
+                            text: 'วันที่ออกต้องมากกว่าวันที่เข้าพัก',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Validate room type and count
+                $count = intval($Count);
+                if($count >= 3 && strpos($RoomType, 'ห้องเล็ก') !== false) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'ประเภทห้องไม่เหมาะสม',
+                            text: 'กรุณาเลือกห้องใหญ่สำหรับสัตว์เลี้ยง 3-4 ตัว',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Handle file upload
+                if (!isset($_FILES["payment_slip"]) || $_FILES["payment_slip"]["error"] != 0) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'กรุณาอัพโหลดสลิปการโอนเงิน',
+                            text: 'ไม่พบไฟล์ที่อัพโหลด',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Check if image file is actual image or fake image
+                $check = getimagesize($_FILES["payment_slip"]["tmp_name"]);
+                if($check === false) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'ไฟล์ไม่ใช่รูปภาพ',
+                            text: 'กรุณาอัพโหลดไฟล์รูปภาพเท่านั้น',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Check file size (max 5MB)
+                if ($_FILES["payment_slip"]["size"] > 5000000) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'ไฟล์มีขนาดใหญ่เกินไป',
+                            text: 'ขนาดไฟล์ต้องไม่เกิน 5MB',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Get file extension
+                $file_extension = strtolower(pathinfo($_FILES["payment_slip"]["name"], PATHINFO_EXTENSION));
+                
+                // Allow certain file formats
+                if($file_extension != "jpg" && $file_extension != "jpeg" && $file_extension != "png") {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'รูปแบบไฟล์ไม่ถูกต้อง',
+                            text: 'รองรับเฉพาะไฟล์ JPG, JPEG & PNG เท่านั้น',
+                            icon: 'warning',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    </script>";
+                    exit();
+                }
+
+                // Read file content
+                $image_data = file_get_contents($_FILES["payment_slip"]["tmp_name"]);
+                
+                // Calculate number of days
+                $daysDiff = ceil(($checkOutDate - $checkInDate) / (60 * 60 * 24));
+                
+                // Insert into database
+                $sta = "Pending";
+                $sql = "INSERT INTO roombook(Name,Email,Phone,RoomType,Count,NoofRoom,cin,cout,stat,nodays,payment_slip_image) 
+                        VALUES ('$Name','$Email','$Phone','$RoomType','$Count','$NoofRoom','$cin','$cout','$sta',$daysDiff,?)";
+                
+                // Prepare statement
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "s", $image_data);
+                
+                if (mysqli_stmt_execute($stmt)) {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'จองห้องพักสำเร็จ',
+                            text: 'กรุณารอการยืนยันจากเจ้าหน้าที่',
+                            icon: 'success',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'home.php';
+                            }
+                        });
+                    </script>";
+                } else {
+                    echo "<script>
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            text: 'ไม่สามารถบันทึกข้อมูลได้',
+                            icon: 'error',
+                            confirmButtonText: 'ยืนยัน',
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
                     </script>";
                 }
-                else{
-                    // Handle file upload
-                    if (isset($_FILES["payment_slip"]) && $_FILES["payment_slip"]["error"] == 0) {
-                        // Check if image file is actual image or fake image
-                        $check = getimagesize($_FILES["payment_slip"]["tmp_name"]);
-                        if($check === false) {
-                            echo "<script>swal({
-                                title: 'ไฟล์ไม่ใช่รูปภาพ',
-                                text: 'กรุณาอัพโหลดไฟล์รูปภาพเท่านั้น',
-                                icon: 'error',
-                            });
-                            </script>";
-                        } else {
-                            // Check file size (max 5MB)
-                            if ($_FILES["payment_slip"]["size"] > 5000000) {
-                                echo "<script>swal({
-                                    title: 'ไฟล์มีขนาดใหญ่เกินไป',
-                                    text: 'ขนาดไฟล์ต้องไม่เกิน 5MB',
-                                    icon: 'error',
-                                });
-                                </script>";
-                            } else {
-                                // Get file extension
-                                $file_extension = strtolower(pathinfo($_FILES["payment_slip"]["name"], PATHINFO_EXTENSION));
-                                
-                                // Allow certain file formats
-                                if($file_extension != "jpg" && $file_extension != "jpeg" && $file_extension != "png") {
-                                    echo "<script>swal({
-                                        title: 'รูปแบบไฟล์ไม่ถูกต้อง',
-                                        text: 'รองรับเฉพาะไฟล์ JPG, JPEG & PNG เท่านั้น',
-                                        icon: 'error',
-                                    });
-                                    </script>";
-                                } else {
-                                    // Read file content
-                                    $image_data = file_get_contents($_FILES["payment_slip"]["tmp_name"]);
-                                    
-                                    // Calculate number of days
-                                    $checkInDate = strtotime($cin);
-                                    $checkOutDate = strtotime($cout);
-                                    $daysDiff = ceil(($checkOutDate - $checkInDate) / (60 * 60 * 24));
-                                    
-                                    // Insert into database
-                                    $sta = "Pending";
-                                    $sql = "INSERT INTO roombook(Name,Email,Phone,RoomType,Count,NoofRoom,cin,cout,stat,nodays,payment_slip_image) 
-                                            VALUES ('$Name','$Email','$Phone','$RoomType','$Count','$NoofRoom','$cin','$cout','$sta',$daysDiff,?)";
-                                    
-                                    // Prepare statement
-                                    $stmt = mysqli_prepare($conn, $sql);
-                                    mysqli_stmt_bind_param($stmt, "s", $image_data);
-                                    
-                                    if (mysqli_stmt_execute($stmt)) {
-                                        echo "<script>
-                                            Swal.fire({
-                                                title: 'จองห้องพักสำเร็จ',
-                                                text: 'กรุณารอการยืนยันจากเจ้าหน้าที่',
-                                                icon: 'success',
-                                                confirmButtonText: 'ยืนยัน',
-                                                allowOutsideClick: false
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    window.location.href = 'home.php';
-                                                }
-                                            });
-                                        </script>";
-                                    } else {
-                                        echo "<script>
-                                            swal({
-                                                title: 'เกิดข้อผิดพลาด',
-                                                text: 'ไม่สามารถบันทึกข้อมูลได้',
-                                                icon: 'error',
-                                                buttons: {
-                                                    confirm: {
-                                                        text: 'ตกลง',
-                                                        value: true
-                                                    }
-                                                },
-                                                closeOnClickOutside: false
-                                            });
-                                        </script>";
-                                    }
-                                    
-                                    mysqli_stmt_close($stmt);
-                                }
-                            }
-                        }
-                    } else {
-                        echo "<script>
-                            swal({
-                                title: 'กรุณาอัพโหลดสลิปการโอนเงิน',
-                                text: 'ไม่พบไฟล์ที่อัพโหลด',
-                                icon: 'error',
-                                buttons: {
-                                    confirm: {
-                                        text: 'ตกลง',
-                                        value: true
-                                    }
-                                },
-                                closeOnClickOutside: false
-                            });
-                        </script>";
-                    }
-                }
+                
+                mysqli_stmt_close($stmt);
             }
-            ?>
+        ?>
           </div>
 
     </div>
@@ -374,7 +457,7 @@ if($usermail == true){
             swal({
                 title: 'วันที่ไม่ถูกต้อง',
                 text: 'วันที่เข้าพักต้องไม่น้อยกว่าวันปัจจุบัน',
-                icon: 'error',
+                icon: 'warning',
             });
             this.value = '';
             return;
@@ -384,7 +467,7 @@ if($usermail == true){
             swal({
                 title: 'วันที่ไม่ถูกต้อง',
                 text: 'วันที่ออกต้องมากกว่าวันที่เข้าพัก',
-                icon: 'error',
+                icon: 'warning',
             });
             this.value = '';
         }
@@ -398,7 +481,7 @@ if($usermail == true){
             swal({
                 title: 'วันที่ไม่ถูกต้อง',
                 text: 'วันที่ออกต้องมากกว่าวันที่เข้าพัก',
-                icon: 'error',
+                icon: 'warning',
             });
             this.value = '';
         }
@@ -432,16 +515,173 @@ if($usermail == true){
             checkOut: formData.get('cout')
         };
 
-        // Validate required fields
-        if (!bookingDetails.name || !bookingDetails.email || !bookingDetails.animalType || 
-            !bookingDetails.roomType || !bookingDetails.checkIn || !bookingDetails.checkOut) {
+        // Validate required fields with specific messages
+        if (!bookingDetails.name) {
             swal({
-                title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                icon: 'error',
+                title: 'กรุณากรอกชื่อ-นามสกุล',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.email) {
+            swal({
+                title: 'กรุณากรอกอีเมล',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.phone) {
+            swal({
+                title: 'กรุณากรอกเบอร์โทรศัพท์',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.animalType) {
+            swal({
+                title: 'กรุณาเลือกประเภทสัตว์',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.roomType) {
+            swal({
+                title: 'กรุณาเลือกประเภทห้อง',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.count) {
+            swal({
+                title: 'กรุณาเลือกจำนวนสัตว์เลี้ยง',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.noOfRoom) {
+            swal({
+                title: 'กรุณาเลือกจำนวนห้อง',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.checkIn) {
+            swal({
+                title: 'กรุณาเลือกวันที่เข้าพัก',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+        if (!bookingDetails.checkOut) {
+            swal({
+                title: 'กรุณาเลือกวันที่ออก',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
             });
             return;
         }
 
+        // Validate dates
+        const checkInDate = new Date(bookingDetails.checkIn);
+        const checkOutDate = new Date(bookingDetails.checkOut);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Check if check-in date is in the past
+        if (checkInDate < today) {
+            swal({
+                title: 'วันที่ไม่ถูกต้อง',
+                text: 'วันที่เข้าพักต้องไม่น้อยกว่าวันปัจจุบัน',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+
+        // Check if check-out date is before or equal to check-in date
+        if (checkOutDate <= checkInDate) {
+            swal({
+                title: 'วันที่ไม่ถูกต้อง',
+                text: 'วันที่ออกต้องมากกว่าวันที่เข้าพัก',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+
+        // Validate room type and count
+        const count = parseInt(bookingDetails.count);
+        if (count >= 3 && bookingDetails.roomType.includes('ห้องเล็ก')) {
+            swal({
+                title: 'ประเภทห้องไม่เหมาะสม',
+                text: 'กรุณาเลือกห้องใหญ่สำหรับสัตว์เลี้ยง 3-4 ตัว',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
+            });
+            return;
+        }
+
+        // Proceed with booking process
+        proceedWithBooking(bookingDetails);
+    }
+
+    function proceedWithBooking(bookingDetails) {
         // Update hidden inputs in payment form
         document.getElementById('payment_name').value = bookingDetails.name;
         document.getElementById('payment_email').value = bookingDetails.email;
@@ -512,7 +752,13 @@ if($usermail == true){
         if (!paymentSlip) {
             swal({
                 title: 'กรุณาอัพโหลดสลิปการโอนเงิน',
-                icon: 'error',
+                text: 'กรุณาอัพโหลดสลิปการโอนเงินเพื่อยืนยันการจอง',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
             });
             return false;
         }
@@ -525,7 +771,12 @@ if($usermail == true){
             swal({
                 title: 'รูปแบบไฟล์ไม่ถูกต้อง',
                 text: 'รองรับเฉพาะไฟล์ JPG, JPEG & PNG เท่านั้น',
-                icon: 'error',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
             });
             return false;
         }
@@ -534,21 +785,29 @@ if($usermail == true){
             swal({
                 title: 'ไฟล์มีขนาดใหญ่เกินไป',
                 text: 'ขนาดไฟล์ต้องไม่เกิน 5MB',
-                icon: 'error',
+                icon: 'warning',
+                confirmButtonText: 'ยืนยัน',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
             });
             return false;
         }
 
-        // Show loading state
-        swal({
-            title: 'กำลังส่งข้อมูล',
-            text: 'กรุณารอสักครู่...',
-            icon: 'info',
-            buttons: false,
-            closeOnClickOutside: false,
+        // Show confirmation dialog
+        return new Promise((resolve) => {
+            swal({
+                title: 'ยืนยันการจอง',
+                text: 'คุณต้องการยืนยันการจองใช่หรือไม่?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่, ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                resolve(result.isConfirmed);
+            });
         });
-
-        return true;
     }
 
     function updateRoomOptions() {
@@ -573,6 +832,13 @@ if($usermail == true){
 
         // Enable/disable room select based on animal selection
         roomSelect.disabled = !selectedAnimal;
+    }
+
+    function editBooking() {
+        // Hide payment panel
+        paymentPanel.style.display = "none";
+        // Show booking form
+        bookbox.style.display = "flex";
     }
 
     // Add event listener for bed selection
@@ -606,12 +872,5 @@ if($usermail == true){
             }
         });
     });
-
-    function editBooking() {
-        // Hide payment panel
-        paymentPanel.style.display = "none";
-        // Show booking form
-        bookbox.style.display = "flex";
-    }
 </script>
 </html>

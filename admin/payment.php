@@ -11,7 +11,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PET-CARE - Admin</title>
+    <title>PET-CARE - การชำระเงิน</title>
     <!-- boot -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -21,10 +21,54 @@
 	<link rel="stylesheet" href="css/roombook.css">
     <!-- sweet alert -->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <style>
+        .searchsection {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .searchsection input {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 300px;
+        }
+        .exportexcel {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            background-color: #28a745;
+        }
+        .table thead th {
+            background-color: #4169E1;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+        .table tbody td {
+            padding: 8px;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            margin: 2px;
+        }
+        .action {
+            min-width: 200px;
+        }
+    </style>
 </head>
 <body>
 	<div class="searchsection">
-        <input type="text" name="search_bar" id="search_bar" placeholder="ค้นหา..." onkeyup="searchFun()">
+        <input type="text" name="search_bar" id="search_bar" placeholder="Search..." onkeyup="searchFun()">
         <form action="./exportdata.php" method="post">
             <button class="exportexcel" id="exportexcel" name="exportexcel" type="submit"><i class="fa-solid fa-file-arrow-down"></i></button>
         </form>
@@ -32,25 +76,32 @@
 
     <div class="roombooktable" class="table-responsive-xl">
         <?php
-            $paymenttablesql = "SELECT * FROM payment";
+            // แก้ไข query เพื่อแก้ปัญหา mysqli_result เป็น boolean
+            $paymenttablesql = "SELECT p.* FROM payment p ORDER BY p.id ASC";
             $paymentresult = mysqli_query($conn, $paymenttablesql);
-
-            $nums = mysqli_num_rows($paymentresult);
+            
+            // ตรวจสอบความผิดพลาดของ query
+            if ($paymentresult === false) {
+                echo "Error in query: " . mysqli_error($conn);
+            } else {
+                $nums = mysqli_num_rows($paymentresult);
+            }
         ?>
         <table class="table table-bordered" id="table-data">
             <thead>
                 <tr>
-                    <th scope="col">Id</th>
+                    <th scope="col">ลำดับ</th>
                     <th scope="col">ชื่อ</th>
                     <th scope="col">อีเมล</th>
                     <th scope="col">ประเภทห้อง</th>
+                    <th scope="col">เลขห้อง</th>
                     <th scope="col">จำนวนห้อง</th>
                     <th scope="col">วันที่เข้าพัก</th>
                     <th scope="col">วันที่ออก</th>
                     <th scope="col">จำนวนวัน</th>
-                    <th scope="col">ราคาห้อง/วัน</th>
+                    <th scope="col">ราคาต่อวัน</th>
                     <th scope="col">ราคารวม</th>
-                    <th scope="col">สลิปการโอนเงิน</th>
+                    <th scope="col">สถานะ</th>
                     <th scope="col" class="action">จัดการ</th>
                 </tr>
             </thead>
@@ -58,17 +109,17 @@
             <tbody>
             <?php
             while ($res = mysqli_fetch_array($paymentresult)) {
-                // Get payment slip from roombook table
-                $roombook_sql = "SELECT payment_slip_image FROM roombook WHERE id = ?";
-                $roombook_stmt = mysqli_prepare($conn, $roombook_sql);
-                mysqli_stmt_bind_param($roombook_stmt, "i", $res['id']);
-                mysqli_stmt_execute($roombook_stmt);
-                $roombook_result = mysqli_stmt_get_result($roombook_stmt);
-                $roombook_row = mysqli_fetch_assoc($roombook_result);
-                $payment_slip = isset($roombook_row['payment_slip_image']) ? $roombook_row['payment_slip_image'] : null;
-                mysqli_stmt_close($roombook_stmt);
-
-                // Calculate price per day
+                // ดึงข้อมูลสถานะจาก roombook
+                $booking_sql = "SELECT stat FROM roombook WHERE id = " . $res['id'];
+                $booking_result = mysqli_query($conn, $booking_sql);
+                $status = "NotConfirm";
+                
+                if ($booking_result && mysqli_num_rows($booking_result) > 0) {
+                    $booking_row = mysqli_fetch_assoc($booking_result);
+                    $status = $booking_row['stat'];
+                }
+                
+                // คำนวณราคาต่อวัน
                 $price_per_day = 0;
                 if($res['RoomType']=="ห้องเล็ก - แมว") {
                     $price_per_day = 200;
@@ -79,30 +130,39 @@
                 } else if($res['RoomType']=="ห้องใหญ่ - หมา") {
                     $price_per_day = 500;
                 }
+                
+                // กำหนดสีของสถานะ
+                $status_class = '';
+                if ($status == 'Confirm') {
+                    $status_class = 'text-success';
+                } else if ($status == 'Checkout') {
+                    $status_class = 'text-secondary';
+                } else {
+                    $status_class = 'text-warning';
+                }
             ?>
                 <tr>
                     <td><?php echo $res['id'] ?></td>
                     <td><?php echo $res['Name'] ?></td>
                     <td><?php echo $res['Email'] ?></td>
                     <td><?php echo $res['RoomType'] ?></td>
+                    <td>N/A</td>
                     <td><?php echo $res['NoofRoom'] ?></td>
                     <td><?php echo $res['cin'] ?></td>
                     <td><?php echo $res['cout'] ?></td>
                     <td><?php echo $res['noofdays'] ?></td>
                     <td><?php echo number_format($price_per_day, 2) ?> บาท</td>
                     <td><?php echo number_format($res['finaltotal'], 2) ?> บาท</td>
-                    <td>
-                        <?php if($payment_slip) { ?>
-                            <button class="btn btn-info btn-sm" onclick="viewPaymentSlip(<?php echo $res['id'] ?>)">
-                                <i class="fa-solid fa-image"></i> ดูสลิป
-                            </button>
-                        <?php } else { ?>
-                            <span class="text-muted">ไม่มีสลิป</span>
-                        <?php } ?>
-                    </td>
+                    <td class="<?php echo $status_class ?>"><?php echo $status ?></td>
                     <td class="action">
-                        <a href="invoiceprint.php?id=<?php echo $res['id'] ?>" target="_blank"><button class="btn btn-primary"><i class="fa-solid fa-print"></i> พิมพ์</button></a>
-                        <a href="paymentdelete.php?id=<?php echo $res['id'] ?>"><button class='btn btn-danger'>ลบ</button></a>
+                        <a href="invoiceprint.php?id=<?php echo $res['id'] ?>" target="_blank">
+                            <button class="btn btn-primary"><i class="fa-solid fa-print"></i> พิมพ์</button>
+                        </a>
+                        <?php if($status != "Checkout") { ?>
+                            <a href="paymentdelete.php?id=<?php echo $res['id'] ?>">
+                                <button class="btn btn-danger"><i class="fa-solid fa-trash"></i> ลบ</button>
+                            </a>
+                        <?php } ?>
                     </td>
                 </tr>
             <?php
@@ -112,21 +172,6 @@
         </table>
     </div>
 </body>
-
-<!-- Payment Slip Modal -->
-<div class="modal fade" id="paymentSlipModal" tabindex="-1" aria-labelledby="paymentSlipModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentSlipModalLabel">สลิปการโอนเงิน</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="paymentSlipImage" src="" alt="Payment Slip" class="img-fluid">
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     //search bar logic using js
@@ -152,19 +197,6 @@
         }
 
     }
-
-    // Function to view payment slip
-    function viewPaymentSlip(id) {
-        const modal = new bootstrap.Modal(document.getElementById('paymentSlipModal'));
-        const img = document.getElementById('paymentSlipImage');
-        
-        // Set image source to the PHP script that will fetch the image
-        img.src = `get_payment_slip.php?id=${id}`;
-        
-        // Show the modal
-        modal.show();
-    }
-
 </script>
 
 </html>

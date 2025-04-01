@@ -183,9 +183,7 @@ nav ul li button.btn-danger:hover {
 
 .head{
     text-align: center;
-    margin-bottom: 40px;
-    font-family: "Noto Sans Thai", sans-serif;
-    font-weight: 600;
+    padding: 40px 0;
 }
 
 .roomselect{
@@ -269,12 +267,13 @@ nav ul li button.btn-danger:hover {
 }
 
 #guestdetailpanel .guestdetailpanelform{
-    height: 500px;
-    width: 800px;
+    height: auto;
+    width: 1000px;
     background-color: white;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    padding-bottom: 20px;
 }
 
 #guestdetailpanel .head{
@@ -300,16 +299,17 @@ nav ul li button.btn-danger:hover {
 }
 
 #guestdetailpanel .middle{
-    height: 380px;
+    height: auto;
     width: 100%;
     display: flex;
-    padding: 20px;
+    padding: 30px;
+    gap: 20px;
 }
 
 #guestdetailpanel .guestinfo{
     height: 100%;
     width: 50%;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 #guestdetailpanel .guestinfo h4{
@@ -336,7 +336,7 @@ nav ul li button.btn-danger:hover {
 #guestdetailpanel .reservationinfo{
     height: 100%;
     width: 50%;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 #guestdetailpanel .reservationinfo h4{
@@ -353,21 +353,30 @@ nav ul li button.btn-danger:hover {
     padding: 0 10px;
 }
 
-#guestdetailpanel .datesection{
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-#guestdetailpanel .datesection span{
+#guestdetailpanel .datesection {
     display: flex;
     flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
 }
 
-#guestdetailpanel .datesection input{
-    width: 200px;
+#guestdetailpanel .datesection span {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#guestdetailpanel .datesection label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+#guestdetailpanel .datesection input {
+    width: 100%;
     height: 40px;
-    margin: 10px 0;
+    margin: 0;
     border: 1px solid #0040ff;
     border-radius: 5px;
     padding: 0 10px;
@@ -377,22 +386,38 @@ nav ul li button.btn-danger:hover {
     height: 60px;
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
+    gap: 10px;
+    padding: 0 30px;
 }
 
 #guestdetailpanel .footer button{
+    min-width: 120px;
     padding: 10px 30px;
     border: none;
     border-radius: 5px;
-    background-color: #0040ff;
-    color: white;
     font-weight: 500;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-#guestdetailpanel .footer button:hover{
-    background-color: #0033cc;
+#guestdetailpanel .footer button.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+#guestdetailpanel .footer button.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+#guestdetailpanel .footer button.btn-success:hover {
+    background-color: #218838;
+}
+
+#guestdetailpanel .footer button.btn-danger:hover {
+    background-color: #c82333;
 }
 
 #thirdsection{
@@ -725,4 +750,186 @@ nav ul li button.btn-danger:hover {
 
 .btn-close:hover {
     color: #dc3545;
+}
+
+/* Room Section Styles */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 0 50px;
+    margin-bottom: 50px;
+}
+
+.room-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+}
+
+.room-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.room-info {
+    padding: 20px;
+    background: #CD853F;
+    color: white;
+}
+
+.room-info h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+}
+
+.room-info p {
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+}
+
+.book-btn {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.book-btn:hover {
+    background: #0056b3;
+}
+
+/* Booking Modal Styles */
+.booking-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.booking-content {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.date-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.date-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.date-group label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.date-group input {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0 10px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
 }

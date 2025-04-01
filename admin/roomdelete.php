@@ -4,10 +4,20 @@ include '../config.php';
 
 $id = $_GET['id'];
 
-$roomdeletesql = "DELETE FROM room WHERE id = $id";
+// ลบข้อมูลจากตาราง room
+$delete_sql = "DELETE FROM room WHERE id = $id";
+$delete_result = mysqli_query($conn, $delete_sql);
 
-$result = mysqli_query($conn, $roomdeletesql);
+if (!$delete_result) {
+    echo "<script>
+            alert('เกิดข้อผิดพลาดในการลบข้อมูล: " . mysqli_error($conn) . "');
+            window.location.href='room.php';
+          </script>";
+    exit;
+}
 
-header("Location:room.php");
-
+echo "<script>
+        alert('ลบห้องเรียบร้อยแล้ว');
+        window.location.href='room.php';
+      </script>";
 ?>
